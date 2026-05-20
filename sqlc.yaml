@@ -1,0 +1,35 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./internal/adapters/outbound/postgres/sql"
+    schema: "./internal/adapters/outbound/postgres/migrations"
+    gen:
+      go:
+        package: "queries"
+        out: "./internal/adapters/outbound/postgres/queries"
+        sql_package: "pgx/v5"
+        overrides:
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+              pointer: true
+          - db_type: "uuid"
+            nullable: false
+            go_type:
+                import: "github.com/google/uuid"
+                type: "UUID"
+                pointer: false
+          - db_type: "timestamptz"
+            nullable: false
+            go_type:
+              import: "time"
+              type: "Time"
+              pointer: false
+          - db_type: "timestamptz"
+            nullable: true
+            go_type:
+              import: "time"
+              type: "Time"
+              pointer: true
