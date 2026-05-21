@@ -24,7 +24,7 @@ func (r *RepositoryOrderPostgres) CreateOrder(ctx context.Context, order *domain
 
 	arg := queries.CreateOrderParams{
 		OrderID: order.OrderID,
-		Status:  order.Status,
+		Status:  string(order.Status),
 		Price:   int32(order.Price),
 	}
 
@@ -45,7 +45,7 @@ func toDomain(o queries.Order) *domain.Order {
 		ID:        o.ID,
 		OrderID:   o.OrderID,
 		Price:     int64(o.Price),
-		Status:    o.Status,
+		Status:    domain.OrderStatus(o.Status),
 		CreatedAt: o.CreatedAt,
 		UpdatedAt: o.UpdatedAt,
 	}
