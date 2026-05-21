@@ -6,5 +6,5 @@ import (
 )
 
 type OrderRepository interface {
-	CreateOrder(ctx context.Context, order *domain.Order) error
+	CreateOrder(ctx context.Context, order *domain.Order) (*domain.Order, error)
 }

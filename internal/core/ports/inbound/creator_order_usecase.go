@@ -3,5 +3,5 @@ package inbound
 import "context"
 
 type CreatorOrder interface {
-	CreateOrder(ctx context.Context) error
+	CreateOrder(ctx context.Context, createOrderInput *CreateOrderInput) (*CreateOrderOutput, error)
 }

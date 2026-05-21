@@ -6,11 +6,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type OrderStatus string
+
+const (
+	CREATED  OrderStatus = "CREATED"
+	PENDING  OrderStatus = "PENDING"
+	APPROVED OrderStatus = "APPROVED"
+	REJECTED OrderStatus = "REJECTED"
+)
+
 type Order struct {
 	ID        int64
 	OrderID   uuid.UUID
 	Price     int64
-	Status    string
+	Status    OrderStatus
 	CreatedAt time.Time
 	UpdatedAt *time.Time
+}
+
+func NewOrder(price int64, status OrderStatus) *Order {
+	return &Order{
+		OrderID: uuid.New(),
+		Price:   price,
+		Status:  status,
+	}
 }
