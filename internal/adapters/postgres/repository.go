@@ -1,28 +1,29 @@
 package postgres
 
 import (
-	queries2 "app/db/queries"
-	"app/internal/core/domain"
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"app/db/queries"
+	"app/internal/core/domain"
 )
 
 type RepositoryOrderPostgres struct {
 	conn *pgxpool.Pool
-	q    *queries2.Queries
+	q    *queries.Queries
 }
 
 func NewOrderRepositoryPostgress(c *pgxpool.Pool) *RepositoryOrderPostgres {
 	return &RepositoryOrderPostgres{
 		conn: c,
-		q:    queries2.New(c),
+		q:    queries.New(c),
 	}
 }
 
 func (r *RepositoryOrderPostgres) CreateOrder(ctx context.Context, order *domain.Order) (*domain.Order, error) {
 
-	arg := queries2.CreateOrderParams{
+	arg := queries.CreateOrderParams{
 		OrderID: order.OrderID,
 		Status:  string(order.Status),
 		Price:   int32(order.Price),
@@ -39,7 +40,7 @@ func (r *RepositoryOrderPostgres) CreateOrder(ctx context.Context, order *domain
 	return o, nil
 }
 
-func toDomain(o queries2.Order) *domain.Order {
+func toDomain(o queries.Order) *domain.Order {
 
 	return &domain.Order{
 		ID:        o.ID,
