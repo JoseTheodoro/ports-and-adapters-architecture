@@ -1,4 +1,4 @@
-package outbound
+package ports
 
 import (
 	"app/internal/core/domain"

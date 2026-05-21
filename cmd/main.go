@@ -1,9 +1,9 @@
 package main
 
 import (
-	http2 "app/internal/adapters/inbound/http/order"
-	"app/internal/adapters/outbound/postgres"
-	"app/internal/core/application/order"
+	http2 "app/internal/adapters/http"
+	"app/internal/adapters/postgres"
+	"app/internal/core/application"
 	"context"
 	"fmt"
 	"log"
@@ -22,7 +22,7 @@ func main() {
 	defer conn.Close()
 
 	repository := postgres.NewOrderRepositoryPostgress(conn)
-	createOrderInteractor := order.NewCreateOrderInteractor(repository)
+	createOrderInteractor := application.NewCreateOrderInteractor(repository)
 	h := http2.NewHandleCreateOrder(createOrderInteractor)
 
 	mux := http.NewServeMux()
