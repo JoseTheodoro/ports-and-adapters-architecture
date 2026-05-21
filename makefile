@@ -1,7 +1,7 @@
 include .env
 export
 
-MIGRATIONS_PATH=./internal/adapters/outbound/postgres/migrations
+MIGRATIONS_PATH=./db/migrations
 
 migration-create:
 	migrate create -ext sql -dir $(MIGRATIONS_PATH) -seq $(filename)

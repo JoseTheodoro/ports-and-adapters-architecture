@@ -1,18 +1,19 @@
-package http
+package order
 
 import (
-	"app/internal/adapters/inbound/http/dto"
-	"app/internal/core/ports/inbound"
+	dto2 "app/internal/adapters/inbound/http/order/dto"
+	"app/internal/core/ports/inbound/order"
+	"app/internal/core/ports/inbound/order/dto"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
 type HandleCreateOrder struct {
-	creator inbound.CreatorOrder
+	creator order.CreateOrderUseCase
 }
 
-func NewHandleCreateOrder(c inbound.CreatorOrder) *HandleCreateOrder {
+func NewHandleCreateOrder(c order.CreateOrderUseCase) *HandleCreateOrder {
 	return &HandleCreateOrder{
 		creator: c,
 	}
@@ -57,8 +58,8 @@ func (h *HandleCreateOrder) CreateOrder(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func (h *HandleCreateOrder) validate(r *http.Request) (*dto.CreateOrderRequest, error) {
-	var createOrderRequest = &dto.CreateOrderRequest{}
+func (h *HandleCreateOrder) validate(r *http.Request) (*dto2.CreateOrderRequest, error) {
+	var createOrderRequest = &dto2.CreateOrderRequest{}
 
 	// TODO: Implementar validação de borda  http.request (schema por exemplo)
 
@@ -69,17 +70,17 @@ func (h *HandleCreateOrder) validate(r *http.Request) (*dto.CreateOrderRequest, 
 	return createOrderRequest, nil
 }
 
-func (h *HandleCreateOrder) toOrderInput(r *dto.CreateOrderRequest) (*inbound.CreateOrderInput, error) {
+func (h *HandleCreateOrder) toOrderInput(r *dto2.CreateOrderRequest) (*dto.CreateOrderInput, error) {
 
-	input := &inbound.CreateOrderInput{
+	input := &dto.CreateOrderInput{
 		Price: r.Price,
 	}
 
 	return input, nil
 }
 
-func (h *HandleCreateOrder) createResponse(out *inbound.CreateOrderOutput) *dto.CreateOrderResponse {
-	return &dto.CreateOrderResponse{
+func (h *HandleCreateOrder) createResponse(out *dto.CreateOrderOutput) *dto2.CreateOrderResponse {
+	return &dto2.CreateOrderResponse{
 		OrderID:   out.OrderID,
 		Price:     out.Price,
 		Status:    string(out.Status),
@@ -88,7 +89,7 @@ func (h *HandleCreateOrder) createResponse(out *inbound.CreateOrderOutput) *dto.
 	}
 }
 
-func writeResponse(w http.ResponseWriter, response *dto.CreateOrderResponse) error {
+func writeResponse(w http.ResponseWriter, response *dto2.CreateOrderResponse) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(response)

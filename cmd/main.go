@@ -1,11 +1,12 @@
 package main
 
 import (
-	http2 "app/internal/adapters/inbound/http"
+	http2 "app/internal/adapters/inbound/http/order"
 	"app/internal/adapters/outbound/postgres"
-	"app/internal/core/application"
+	"app/internal/core/application/order"
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,11 +15,15 @@ import (
 func main() {
 
 	ctx := context.Background()
-	conn, _ := pgxpool.New(ctx, "postgres://order:order@localhost/order?sslmode=disable")
+	conn, err := pgxpool.New(ctx, "postgres://order:order@localhost/order?sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
 
-	repository := postgres.NewRepositoryOrderPostgress(conn)
-	usecase := application.NewCreateOrderUseCase(repository)
-	h := http2.NewHandleCreateOrder(usecase)
+	repository := postgres.NewOrderRepositoryPostgress(conn)
+	createOrderInteractor := order.NewCreateOrderInteractor(repository)
+	h := http2.NewHandleCreateOrder(createOrderInteractor)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/order", h.CreateOrder)
@@ -29,6 +34,8 @@ func main() {
 	}
 
 	fmt.Println("HTTP Server Started at http://localhost:3001")
-	httpSever.ListenAndServe()
+	if err := httpSever.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 
 }

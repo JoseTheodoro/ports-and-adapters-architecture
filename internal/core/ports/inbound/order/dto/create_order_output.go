@@ -1,10 +1,11 @@
-package inbound
+package dto
 
 import (
-	"app/internal/core/domain"
 	"time"
 
 	"github.com/google/uuid"
+
+	"app/internal/core/domain"
 )
 
 type CreateOrderOutput struct {
