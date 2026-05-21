@@ -1,10 +1,11 @@
 package ports
 
 import (
-	"app/internal/core/domain"
 	"context"
+
+	"app/internal/core/domain"
 )
 
-type OrderRepository interface {
+type OrderStore interface {
 	CreateOrder(ctx context.Context, order *domain.Order) (*domain.Order, error)
 }

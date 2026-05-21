@@ -1,22 +1,23 @@
 package application
 
 import (
+	"context"
+
 	"app/internal/core/domain"
 	"app/internal/core/ports"
-	"context"
 )
 
-type createOrderInteractor struct {
-	repo ports.OrderRepository
+type createOrderHandler struct {
+	repo ports.OrderStore
 }
 
-func NewCreateOrderInteractor(r ports.OrderRepository) ports.CreateOrderUseCase {
-	return &createOrderInteractor{
+func NewCreateOrderHandler(r ports.OrderStore) ports.OrderCreator {
+	return &createOrderHandler{
 		repo: r,
 	}
 }
 
-func (c *createOrderInteractor) CreateOrder(ctx context.Context, createOrderInput *ports.CreateOrderInput) (*ports.CreateOrderOutput, error) {
+func (c *createOrderHandler) CreateOrder(ctx context.Context, createOrderInput *ports.CreateOrderInput) (*ports.CreateOrderOutput, error) {
 
 	order := domain.NewOrder(createOrderInput.Price, domain.CREATED)
 
@@ -30,7 +31,7 @@ func (c *createOrderInteractor) CreateOrder(ctx context.Context, createOrderInpu
 	return orderOutPut, nil
 }
 
-func (c *createOrderInteractor) toOrderOutput(order *domain.Order) *ports.CreateOrderOutput {
+func (c *createOrderHandler) toOrderOutput(order *domain.Order) *ports.CreateOrderOutput {
 
 	return &ports.CreateOrderOutput{
 		OrderID:   order.OrderID,

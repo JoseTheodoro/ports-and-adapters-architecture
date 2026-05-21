@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-type CreateOrderUseCase interface {
+type OrderCreator interface {
 	CreateOrder(ctx context.Context, createOrderInput *CreateOrderInput) (*CreateOrderOutput, error)
 }

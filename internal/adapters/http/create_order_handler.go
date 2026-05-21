@@ -8,10 +8,10 @@ import (
 )
 
 type HandleCreateOrder struct {
-	creator ports.CreateOrderUseCase
+	creator ports.OrderCreator
 }
 
-func NewHandleCreateOrder(c ports.CreateOrderUseCase) *HandleCreateOrder {
+func NewHandleCreateOrder(c ports.OrderCreator) *HandleCreateOrder {
 	return &HandleCreateOrder{
 		creator: c,
 	}

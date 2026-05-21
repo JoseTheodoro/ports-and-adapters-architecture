@@ -22,7 +22,7 @@ func main() {
 	defer conn.Close()
 
 	repository := postgres.NewOrderRepositoryPostgress(conn)
-	createOrderInteractor := application.NewCreateOrderInteractor(repository)
+	createOrderInteractor := application.NewCreateOrderHandler(repository)
 	h := http2.NewHandleCreateOrder(createOrderInteractor)
 
 	mux := http.NewServeMux()
