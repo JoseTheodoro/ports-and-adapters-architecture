@@ -1,4 +1,4 @@
-package ports
+package createorder
 
 import (
 	"time"
@@ -8,7 +8,11 @@ import (
 	"app/internal/core/domain"
 )
 
-type CreateOrderOutput struct {
+type OrderInput struct {
+	Price int64
+}
+
+type OrderOutput struct {
 	OrderID   uuid.UUID
 	Price     int64
 	Status    domain.OrderStatus

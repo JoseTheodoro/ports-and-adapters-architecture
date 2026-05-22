@@ -21,7 +21,7 @@ func NewOrderRepositoryPostgress(c *pgxpool.Pool) *RepositoryOrderPostgres {
 	}
 }
 
-func (r *RepositoryOrderPostgres) CreateOrder(ctx context.Context, order *domain.Order) (*domain.Order, error) {
+func (r *RepositoryOrderPostgres) Create(ctx context.Context, order *domain.Order) (*domain.Order, error) {
 
 	arg := queries.CreateOrderParams{
 		OrderID: order.OrderID,

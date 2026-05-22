@@ -1,29 +1,33 @@
 package main
 
 import (
-	http2 "app/internal/adapters/http"
-	"app/internal/adapters/postgres"
-	"app/internal/core/application"
 	"context"
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	httpapi "app/internal/adapters/http"
+	"app/internal/adapters/postgres"
+	"app/internal/core/application/createorder"
 )
 
 func main() {
 
 	ctx := context.Background()
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	slog.SetDefault(logger)
+
 	conn, err := pgxpool.New(ctx, "postgres://order:order@localhost/order?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("error on connect to database", "err", err)
 	}
 	defer conn.Close()
 
 	repository := postgres.NewOrderRepositoryPostgress(conn)
-	createOrderInteractor := application.NewCreateOrderHandler(repository)
-	h := http2.NewHandleCreateOrder(createOrderInteractor)
+	createOrderHandler := createorder.NewCreateOrderHandler(repository)
+	h := httpapi.NewHandleCreateOrder(createOrderHandler)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/order", h.CreateOrder)
@@ -33,9 +37,9 @@ func main() {
 		Handler: mux,
 	}
 
-	fmt.Println("HTTP Server Started at http://localhost:3001")
+	slog.Info("HTTP Server Started at http://localhost:3001")
 	if err := httpSever.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		slog.Error("received error from http server", "err", err)
 	}
 
 }
