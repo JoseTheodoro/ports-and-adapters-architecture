@@ -11,4 +11,6 @@ migration-down:
 	migrate -database ${DATABASE_DSN} -path $(MIGRATIONS_PATH) down
 migration-force:
 	migrate -path $(MIGRATIONS_PATH) -database ${DATABASE_DSN} force $(version)
+sqlc:
+	sqlc generate
 

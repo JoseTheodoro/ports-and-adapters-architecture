@@ -9,7 +9,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	httpapi "app/internal/adapters/http"
-	"app/internal/adapters/postgres"
+	approveorderrepo "app/internal/adapters/postgres/approveorder"
+	createorderrepo "app/internal/adapters/postgres/createorder"
+	"app/internal/core/application/approveorder"
 	"app/internal/core/application/createorder"
 )
 
@@ -25,12 +27,22 @@ func main() {
 	}
 	defer conn.Close()
 
-	repository := postgres.NewOrderRepositoryPostgress(conn)
-	createOrderWorkflow := createorder.New(repository)
-	h := httpapi.NewHTTPHandler(createOrderWorkflow)
+	// repositories implementations
+	createOrderRepo := createorderrepo.New(conn)
+	approveOrderRepo := approveorderrepo.New(conn)
+
+	// use cases implementations (port)
+	createOrderService := createorder.New(createOrderRepo)
+	approveOrderService := approveorder.New(approveOrderRepo)
+
+	// http handlers
+	createOrderHandle := httpapi.NewHTTPHandler(createOrderService)
+	approveOrderHandle := httpapi.NewApproveOrderHTTPHandler(approveOrderService)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/order", h.CreateOrder)
+
+	mux.HandleFunc("POST /api/order", createOrderHandle.CreateOrder)
+	mux.HandleFunc("GET /api/order/approve/{id}", approveOrderHandle.ApproveOrder)
 
 	httpSever := http.Server{
 		Addr:    ":3001",

@@ -11,12 +11,12 @@ import (
 )
 
 type CreateOrderHTTPHandler struct {
-	workflow createorder.Runner
+	service createorder.Creator
 }
 
-func NewHTTPHandler(c createorder.Runner) *CreateOrderHTTPHandler {
+func NewHTTPHandler(c createorder.Creator) *CreateOrderHTTPHandler {
 	return &CreateOrderHTTPHandler{
-		workflow: c,
+		service: c,
 	}
 }
 
@@ -37,7 +37,7 @@ func (h *CreateOrderHTTPHandler) CreateOrder(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	orderOutput, err := h.workflow.Run(r.Context(), createOrderInput)
+	orderOutput, err := h.service.Create(r.Context(), createOrderInput)
 	if err != nil {
 		ToJSON(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
 		return

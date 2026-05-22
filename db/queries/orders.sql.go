@@ -11,6 +11,20 @@ import (
 	"github.com/google/uuid"
 )
 
+const approveOrder = `-- name: ApproveOrder :exec
+UPDATE orders SET status = $1, updated_at = now() WHERE order_id = $2
+`
+
+type ApproveOrderParams struct {
+	Status  OrderStatus
+	OrderID uuid.UUID
+}
+
+func (q *Queries) ApproveOrder(ctx context.Context, arg ApproveOrderParams) error {
+	_, err := q.db.Exec(ctx, approveOrder, arg.Status, arg.OrderID)
+	return err
+}
+
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (order_id, price, status) VALUES ($1, $2, $3) RETURNING id, order_id, price, status, created_at, updated_at
 `
@@ -18,11 +32,29 @@ INSERT INTO orders (order_id, price, status) VALUES ($1, $2, $3) RETURNING id, o
 type CreateOrderParams struct {
 	OrderID uuid.UUID
 	Price   int32
-	Status  string
+	Status  OrderStatus
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
 	row := q.db.QueryRow(ctx, createOrder, arg.OrderID, arg.Price, arg.Status)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.Price,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const findByOrderID = `-- name: FindByOrderID :one
+SELECT id, order_id, price, status, created_at, updated_at FROM orders where order_id = $1
+`
+
+func (q *Queries) FindByOrderID(ctx context.Context, orderID uuid.UUID) (Order, error) {
+	row := q.db.QueryRow(ctx, findByOrderID, orderID)
 	var i Order
 	err := row.Scan(
 		&i.ID,

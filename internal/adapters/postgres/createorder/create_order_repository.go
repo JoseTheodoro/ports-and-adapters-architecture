@@ -1,4 +1,4 @@
-package postgres
+package createorder
 
 import (
 	"context"
@@ -9,23 +9,23 @@ import (
 	"app/internal/core/domain"
 )
 
-type RepositoryOrderPostgres struct {
+type Repository struct {
 	conn *pgxpool.Pool
 	q    *queries.Queries
 }
 
-func NewOrderRepositoryPostgress(c *pgxpool.Pool) *RepositoryOrderPostgres {
-	return &RepositoryOrderPostgres{
+func New(c *pgxpool.Pool) *Repository {
+	return &Repository{
 		conn: c,
 		q:    queries.New(c),
 	}
 }
 
-func (r *RepositoryOrderPostgres) Create(ctx context.Context, order *domain.Order) (*domain.Order, error) {
+func (r *Repository) Create(ctx context.Context, order *domain.Order) (*domain.Order, error) {
 
 	arg := queries.CreateOrderParams{
 		OrderID: order.OrderID,
-		Status:  string(order.Status),
+		Status:  queries.OrderStatus(order.Status),
 		Price:   int32(order.Price),
 	}
 

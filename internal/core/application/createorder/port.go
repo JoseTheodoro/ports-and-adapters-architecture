@@ -6,10 +6,10 @@ import (
 	"app/internal/core/domain"
 )
 
-type Repository interface {
-	Create(ctx context.Context, order *domain.Order) (*domain.Order, error)
+type Creator interface {
+	Create(ctx context.Context, createOrderInput *OrderInput) (*OrderOutput, error)
 }
 
-type Runner interface {
-	Run(ctx context.Context, createOrderInput *OrderInput) (*OrderOutput, error)
+type Repository interface {
+	Create(ctx context.Context, order *domain.Order) (*domain.Order, error)
 }
