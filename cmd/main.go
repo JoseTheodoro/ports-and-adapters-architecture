@@ -26,8 +26,8 @@ func main() {
 	defer conn.Close()
 
 	repository := postgres.NewOrderRepositoryPostgress(conn)
-	createOrderHandler := createorder.NewCreateOrderHandler(repository)
-	h := httpapi.NewHandleCreateOrder(createOrderHandler)
+	createOrderWorkflow := createorder.New(repository)
+	h := httpapi.NewHTTPHandler(createOrderWorkflow)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/order", h.CreateOrder)

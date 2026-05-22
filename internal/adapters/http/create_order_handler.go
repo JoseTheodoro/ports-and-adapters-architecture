@@ -10,17 +10,17 @@ import (
 	"app/internal/core/application/createorder"
 )
 
-type CreateOrderHandler struct {
-	creator createorder.Creator
+type CreateOrderHTTPHandler struct {
+	workflow createorder.Runner
 }
 
-func NewHandleCreateOrder(c createorder.Creator) *CreateOrderHandler {
-	return &CreateOrderHandler{
-		creator: c,
+func NewHTTPHandler(c createorder.Runner) *CreateOrderHTTPHandler {
+	return &CreateOrderHTTPHandler{
+		workflow: c,
 	}
 }
 
-func (h *CreateOrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
+func (h *CreateOrderHTTPHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	request := NewCreateOrderRequest(r)
 
@@ -37,7 +37,7 @@ func (h *CreateOrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	orderOutput, err := h.creator.Create(r.Context(), createOrderInput)
+	orderOutput, err := h.workflow.Run(r.Context(), createOrderInput)
 	if err != nil {
 		ToJSON(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
 		return
@@ -45,7 +45,7 @@ func (h *CreateOrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request)
 	ToJSON(w, http.StatusOK, NewCreateOrderResponse(orderOutput))
 }
 
-func (h *CreateOrderHandler) toOrderInput(r *CreateOrderRequest) (*createorder.OrderInput, error) {
+func (h *CreateOrderHTTPHandler) toOrderInput(r *CreateOrderRequest) (*createorder.OrderInput, error) {
 
 	input := &createorder.OrderInput{
 		Price: *r.Price,

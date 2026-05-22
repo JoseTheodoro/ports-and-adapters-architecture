@@ -6,17 +6,17 @@ import (
 	"app/internal/core/domain"
 )
 
-type createOrderHandler struct {
+type Workflow struct {
 	repo Repository
 }
 
-func NewCreateOrderHandler(r Repository) Creator {
-	return &createOrderHandler{
+func New(r Repository) Runner {
+	return &Workflow{
 		repo: r,
 	}
 }
 
-func (c *createOrderHandler) Create(ctx context.Context, createOrderInput *OrderInput) (*OrderOutput, error) {
+func (c *Workflow) Run(ctx context.Context, createOrderInput *OrderInput) (*OrderOutput, error) {
 
 	order := domain.NewOrder(createOrderInput.Price, domain.CREATED)
 
@@ -30,7 +30,7 @@ func (c *createOrderHandler) Create(ctx context.Context, createOrderInput *Order
 	return orderOutPut, nil
 }
 
-func (c *createOrderHandler) toOrderOutput(order *domain.Order) *OrderOutput {
+func (c *Workflow) toOrderOutput(order *domain.Order) *OrderOutput {
 
 	return &OrderOutput{
 		OrderID:   order.OrderID,
