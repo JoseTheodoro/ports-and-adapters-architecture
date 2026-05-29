@@ -4,15 +4,18 @@ import (
 	"app/internal/core/domain"
 	"context"
 	"errors"
+	"time"
 )
 
 type Service struct {
 	repo Repository
+	pub  Publisher
 }
 
-func New(r Repository) *Service {
+func New(r Repository, p Publisher) *Service {
 	return &Service{
 		repo: r,
+		pub:  p,
 	}
 }
 
@@ -37,6 +40,18 @@ func (s *Service) Approve(ctx context.Context, input *OrderInput) error {
 	if err := s.repo.Approve(ctx, order); err != nil {
 		return err
 	}
+
+	// publish event OrderApproved
+	orderApprovedEvent := &domain.OrderApprovedEvent{
+		OrderID:    order.OrderID,
+		Price:      order.Price,
+		ApprovedAt: time.Now(),
+	}
+
+	if err := s.pub.PublishOrderApproved(ctx, orderApprovedEvent); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -1,4 +1,15 @@
 services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: root
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
   postgres:
     image: postgres:16-alpine
     restart: always
@@ -13,3 +24,4 @@ services:
       - data_local_postgres:/var/lib/postgresql/data
 volumes:
   data_local_postgres:
+  rabbitmq_data:

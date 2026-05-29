@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,13 +16,13 @@ var ErrOrderNotFound = errors.New("order not found")
 var ErrOrderAlreadyApproved = errors.New("order already approved")
 
 const (
-	CREATED   OrderStatus = "CREATED"
-	PENDING   OrderStatus = "PENDING"
-	APPROVED  OrderStatus = "APPROVED"
-	PROCSSING OrderStatus = "PROCESSING"
-	SHIPPED   OrderStatus = "SHIPPED"
-	DELIVERED OrderStatus = "DELIVERED"
-	REJECTED  OrderStatus = "REJECTED"
+	CREATED    OrderStatus = "CREATED"
+	PENDING    OrderStatus = "PENDING"
+	APPROVED   OrderStatus = "APPROVED"
+	PROCESSING OrderStatus = "PROCESSING"
+	SHIPPED    OrderStatus = "SHIPPED"
+	DELIVERED  OrderStatus = "DELIVERED"
+	REJECTED   OrderStatus = "REJECTED"
 )
 
 type Order struct {
@@ -55,6 +56,21 @@ func (o *Order) Approve() error {
 	}
 
 	o.Status = APPROVED
+
+	return nil
+}
+
+func (o *Order) Process() error {
+
+	if o.Status != APPROVED {
+		return fmt.Errorf("order status must have approved to processing")
+	}
+
+	if o.CreatedAt.Before(time.Now().AddDate(0, 0, -30)) == true {
+		return fmt.Errorf("order has been expired")
+	}
+
+	o.Status = PROCESSING
 
 	return nil
 }

@@ -16,3 +16,7 @@ type Repository interface {
 	Approve(ctx context.Context, order *domain.Order) error
 	FindByOrderID(ctx context.Context, orderID uuid.UUID) (*domain.Order, error)
 }
+
+type Publisher interface {
+	PublishOrderApproved(context.Context, *domain.OrderApprovedEvent) error
+}

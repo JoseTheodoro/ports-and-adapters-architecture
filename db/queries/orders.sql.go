@@ -66,3 +66,17 @@ func (q *Queries) FindByOrderID(ctx context.Context, orderID uuid.UUID) (Order, 
 	)
 	return i, err
 }
+
+const processOrder = `-- name: ProcessOrder :exec
+UPDATE orders SET status = $1, updated_at = now() WHERE order_id = $2
+`
+
+type ProcessOrderParams struct {
+	Status  OrderStatus
+	OrderID uuid.UUID
+}
+
+func (q *Queries) ProcessOrder(ctx context.Context, arg ProcessOrderParams) error {
+	_, err := q.db.Exec(ctx, processOrder, arg.Status, arg.OrderID)
+	return err
+}
